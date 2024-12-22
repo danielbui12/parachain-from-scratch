@@ -1,4 +1,11 @@
-# Create a Parachain from scratch
+# \[Solved\] Create a Parachain from scratch
+
+## Result
+
+<img width="1446" alt="Image" src="https://github.com/user-attachments/assets/8503adbe-5ea5-42d2-abc5-3a130729b90a" />
+
+
+## Solochain to Parachain
 
 <img width="1077" alt="Screenshot 2024-10-11 at 16 16 13" src="https://github.com/user-attachments/assets/e157cfdb-3dbe-4300-831a-cf828881b71b">
 

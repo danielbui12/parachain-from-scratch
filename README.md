@@ -26,6 +26,13 @@ About additional resources, you could learn more about the Parachain network arc
 
 ### Convert a solochain node to a parachain node with Cumulus
 ### Resolve all the TODOs
+Steps: 
+- crate
+- config
+- benchmark
+- api
+- lib 
+
 ![image](https://github.com/user-attachments/assets/d6ec39a0-ff1f-47b9-8a79-30c12bb4dec4)
 
 ### Materials to learn about Cumulus

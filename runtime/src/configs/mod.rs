@@ -23,8 +23,8 @@
 //
 // For more information, please refer to <http://unlicense.org>
 
-// #[path = "xcm.rs"]
-// mod xcm_config;
+#[path = "xcm.rs"]
+mod xcm_config;
 
 // Substrate and Polkadot dependencies
 use cumulus_pallet_parachain_system::RelayNumberMonotonicallyIncreases;
@@ -76,13 +76,13 @@ use super::{
     Balances,
     Block,
     BlockNumber,
-    // CollatorSelection,
-    // ConsensusHook,
+    CollatorSelection,
+    ConsensusHook,
     Hash,
-    // MessageQueue,
+    MessageQueue,
     Nonce,
     PalletInfo,
-    // ParachainSystem,
+    ParachainSystem,
     Runtime,
     RuntimeCall,
     RuntimeEvent,
@@ -90,11 +90,11 @@ use super::{
     RuntimeHoldReason,
     RuntimeOrigin,
     RuntimeTask,
-    // Session,
+    Session,
     SessionKeys,
     System,
     WeightToFee,
-    // XcmpQueue,
+    XcmpQueue,
     AVERAGE_ON_INITIALIZE_RATIO,
     EXISTENTIAL_DEPOSIT,
     HOURS,
@@ -104,8 +104,7 @@ use super::{
     SLOT_DURATION,
     VERSION,
 };
-// TODO: Import crates
-// use xcm_config::{RelayLocation, XcmOriginToTransactDispatchOrigin};
+use xcm_config::{RelayLocation, XcmOriginToTransactDispatchOrigin};
 
 parameter_types! {
     pub const Version: RuntimeVersion = VERSION;
@@ -137,7 +136,6 @@ parameter_types! {
     pub const SS58Prefix: u16 = 42;
 }
 
-// TODO: Update the solochain config
 /// The default types are being injected by [`derive_impl`](`frame_support::derive_impl`) from
 /// [`ParaChainDefaultConfig`](`struct@frame_system::config_preludes::ParaChainDefaultConfig`),
 /// but overridden as needed.
@@ -226,91 +224,73 @@ impl pallet_sudo::Config for Runtime {
     type WeightInfo = (); // Configure based on benchmarking results.
 }
 
-// TODO: Remove when switching to parachain.
-impl pallet_grandpa::Config for Runtime {
-    type RuntimeEvent = RuntimeEvent;
-
-    type WeightInfo = ();
-    type MaxAuthorities = ConstU32<32>;
-    type MaxNominators = ConstU32<0>;
-    type MaxSetIdSessionEntries = ConstU64<0>;
-
-    type KeyOwnerProof = sp_core::Void;
-    type EquivocationReportSystem = ();
-}
-
 parameter_types! {
     pub const ReservedXcmpWeight: Weight = MAXIMUM_BLOCK_WEIGHT.saturating_div(4);
     pub const ReservedDmpWeight: Weight = MAXIMUM_BLOCK_WEIGHT.saturating_div(4);
     pub const RelayOrigin: AggregateMessageOrigin = AggregateMessageOrigin::Parent;
 }
 
-// TODO: Configure pallet
-// impl cumulus_pallet_parachain_system::Config for Runtime {
-//     type WeightInfo = (); // Configure based on benchmarking results.
-//     type RuntimeEvent = RuntimeEvent;
-//     type OnSystemEvent = ();
-//     type SelfParaId = parachain_info::Pallet<Runtime>;
-//     type OutboundXcmpMessageSource = XcmpQueue;
-//     type DmpQueue = frame_support::traits::EnqueueWithOrigin<MessageQueue, RelayOrigin>;
-//     type ReservedDmpWeight = ReservedDmpWeight;
-//     type XcmpMessageHandler = XcmpQueue;
-//     type ReservedXcmpWeight = ReservedXcmpWeight;
-//     type CheckAssociatedRelayNumber = RelayNumberMonotonicallyIncreases;
-//     type ConsensusHook = ConsensusHook;
-// }
+impl cumulus_pallet_parachain_system::Config for Runtime {
+	type WeightInfo = ();
+	type RuntimeEvent = RuntimeEvent;
+	type OnSystemEvent = ();
+	type SelfParaId = parachain_info::Pallet<Runtime>;
+	type OutboundXcmpMessageSource = XcmpQueue;
+	type DmpQueue = frame_support::traits::EnqueueWithOrigin<MessageQueue, RelayOrigin>;
+	type ReservedDmpWeight = ReservedDmpWeight;
+	type XcmpMessageHandler = XcmpQueue;
+	type ReservedXcmpWeight = ReservedXcmpWeight;
+	type CheckAssociatedRelayNumber = RelayNumberMonotonicallyIncreases;
+	type ConsensusHook = ConsensusHook;
+}
 
-// TODO: Configure pallet
-// impl parachain_info::Config for Runtime {}
+impl parachain_info::Config for Runtime {}
 
 parameter_types! {
     pub MessageQueueServiceWeight: Weight = Perbill::from_percent(35) * RuntimeBlockWeights::get().max_block;
 }
 
-// TODO: Configure pallet
-// impl pallet_message_queue::Config for Runtime {
-//     type RuntimeEvent = RuntimeEvent;
-//     type WeightInfo = (); // Configure based on benchmarking results.
-//     #[cfg(feature = "runtime-benchmarks")]
-//     type MessageProcessor = pallet_message_queue::mock_helpers::NoopMessageProcessor<
-//         cumulus_primitives_core::AggregateMessageOrigin,
-//     >;
-//     #[cfg(not(feature = "runtime-benchmarks"))]
-//     type MessageProcessor = xcm_builder::ProcessXcmMessage<
-//         AggregateMessageOrigin,
-//         xcm_executor::XcmExecutor<xcm_config::XcmConfig>,
-//         RuntimeCall,
-//     >;
-//     type Size = u32;
-//     // The XCMP queue pallet is only ever able to handle the `Sibling(ParaId)` origin:
-//     type QueueChangeHandler = NarrowOriginToSibling<XcmpQueue>;
-//     type QueuePausedQuery = NarrowOriginToSibling<XcmpQueue>;
-//     type HeapSize = sp_core::ConstU32<{ 103 * 1024 }>;
-//     type MaxStale = sp_core::ConstU32<8>;
-//     type ServiceWeight = MessageQueueServiceWeight;
-//     type IdleMaxServiceWeight = ();
-// }
+impl pallet_message_queue::Config for Runtime {
+    type RuntimeEvent = RuntimeEvent;
+    type WeightInfo = (); // Configure based on benchmarking results.
+    #[cfg(feature = "runtime-benchmarks")]
+    type MessageProcessor = pallet_message_queue::mock_helpers::NoopMessageProcessor<
+        cumulus_primitives_core::AggregateMessageOrigin,
+    >;
+    #[cfg(not(feature = "runtime-benchmarks"))]
+    type MessageProcessor = xcm_builder::ProcessXcmMessage<
+        AggregateMessageOrigin,
+        xcm_executor::XcmExecutor<xcm_config::XcmConfig>,
+        RuntimeCall,
+    >;
+    type Size = u32;
+    // The XCMP queue pallet is only ever able to handle the `Sibling(ParaId)` origin:
+    type QueueChangeHandler = NarrowOriginToSibling<XcmpQueue>;
+    type QueuePausedQuery = NarrowOriginToSibling<XcmpQueue>;
+    type HeapSize = sp_core::ConstU32<{ 103 * 1024 }>;
+    type MaxStale = sp_core::ConstU32<8>;
+    type ServiceWeight = MessageQueueServiceWeight;
+    type IdleMaxServiceWeight = ();
+}
 
-// TODO: Configure pallet
-// impl cumulus_pallet_aura_ext::Config for Runtime {}
+impl cumulus_pallet_aura_ext::Config for Runtime {}
 
-// TODO: Configure pallet
-// impl cumulus_pallet_xcmp_queue::Config for Runtime {
-//     type RuntimeEvent = RuntimeEvent;
-//     type ChannelInfo = ParachainSystem;
-//     type VersionWrapper = ();
-//     // Enqueue XCMP messages from siblings for later processing.
-//     type XcmpQueue = TransformOrigin<MessageQueue, AggregateMessageOrigin, ParaId, ParaIdToSibling>;
-//     type MaxInboundSuspended = sp_core::ConstU32<1_000>;
-//     type ControllerOrigin = EnsureRoot<AccountId>;
-//     type ControllerOriginConverter = XcmOriginToTransactDispatchOrigin;
-//     type WeightInfo = (); // Configure based on benchmarking results.
-//     type PriceForSiblingDelivery = NoPriceForMessageDelivery<ParaId>;
-//     // Limit the number of messages and signals a HRML channel can have at most
-//     type MaxActiveOutboundChannels = ConstU32<128>;
-//     // Limit the number of HRML channels
-//     type MaxPageSize = ConstU32<{ 1 << 16 }>;
-// }
+impl cumulus_pallet_xcmp_queue::Config for Runtime {
+    type RuntimeEvent = RuntimeEvent;
+    type ChannelInfo = ParachainSystem;
+    type VersionWrapper = ();
+    // Enqueue XCMP messages from siblings for later processing.
+    type XcmpQueue = TransformOrigin<MessageQueue, AggregateMessageOrigin, ParaId, ParaIdToSibling>;
+    type MaxInboundSuspended = sp_core::ConstU32<1_000>;
+    type ControllerOrigin = EnsureRoot<AccountId>;
+    type ControllerOriginConverter = XcmOriginToTransactDispatchOrigin;
+    type WeightInfo = (); // Configure based on benchmarking results.
+    type PriceForSiblingDelivery = NoPriceForMessageDelivery<ParaId>;
+    // Limit the number of messages and signals a HRML channel can have at most
+    type MaxActiveOutboundChannels = ConstU32<128>;
+    // Limit the number of HRML channels
+    type MaxPageSize = ConstU32<{ 1 << 16 }>;
+}
 
 parameter_types! {
     pub const Period: u32 = 6 * HOURS;
@@ -321,14 +301,10 @@ impl pallet_session::Config for Runtime {
     type RuntimeEvent = RuntimeEvent;
     type ValidatorId = <Self as frame_system::Config>::AccountId;
     // we don't have stash and controller, thus we don't need the convert as well.
-    // TODO: Configure pallet
-    // type ValidatorIdOf = pallet_collator_selection::IdentityCollator;
-    type ValidatorIdOf = ();
+    type ValidatorIdOf = pallet_collator_selection::IdentityCollator;
     type ShouldEndSession = pallet_session::PeriodicSessions<Period, Offset>;
     type NextSessionRotation = pallet_session::PeriodicSessions<Period, Offset>;
-    // TODO: Configure pallet
-    type SessionManager = ();
-    // type SessionManager = CollatorSelection;
+    type SessionManager = CollatorSelection;
     // Essentially just Aura, but let's be pedantic.
     type SessionHandler = <SessionKeys as sp_runtime::traits::OpaqueKeys>::KeyTypeIdProviders;
     type Keys = SessionKeys;
@@ -347,30 +323,27 @@ parameter_types! {
     pub const PotId: PalletId = PalletId(*b"PotStake");
     pub const SessionLength: BlockNumber = 6 * HOURS;
     // StakingAdmin pluralistic body.
-    // TODO: Configure variable
-    // pub const StakingAdminBodyId: BodyId = BodyId::Defense;
+    pub const StakingAdminBodyId: BodyId = BodyId::Defense;
 }
 
-// TODO: Configure pallet
-// /// We allow root and the StakingAdmin to execute privileged collator selection operations.
-// pub type CollatorSelectionUpdateOrigin = EitherOfDiverse<
-//     EnsureRoot<AccountId>,
-//     EnsureXcm<IsVoiceOfBody<RelayLocation, StakingAdminBodyId>>,
-// >;
+/// We allow root and the StakingAdmin to execute privileged collator selection operations.
+pub type CollatorSelectionUpdateOrigin = EitherOfDiverse<
+    EnsureRoot<AccountId>,
+    EnsureXcm<IsVoiceOfBody<RelayLocation, StakingAdminBodyId>>,
+>;
 
-// TODO: Configure pallet
-// impl pallet_collator_selection::Config for Runtime {
-//     type RuntimeEvent = RuntimeEvent;
-//     type Currency = Balances;
-//     type UpdateOrigin = CollatorSelectionUpdateOrigin;
-//     type PotId = PotId;
-//     type MaxCandidates = ConstU32<100>;
-//     type MinEligibleCollators = ConstU32<4>;
-//     type MaxInvulnerables = ConstU32<20>;
-//     // should be a multiple of session or things will get inconsistent
-//     type KickThreshold = Period;
-//     type ValidatorId = <Self as frame_system::Config>::AccountId;
-//     type ValidatorIdOf = pallet_collator_selection::IdentityCollator;
-//     type ValidatorRegistration = Session;
-//     type WeightInfo = (); // Configure based on benchmarking results.
-// }
+impl pallet_collator_selection::Config for Runtime {
+    type RuntimeEvent = RuntimeEvent;
+    type Currency = Balances;
+    type UpdateOrigin = CollatorSelectionUpdateOrigin;
+    type PotId = PotId;
+    type MaxCandidates = ConstU32<100>;
+    type MinEligibleCollators = ConstU32<4>;
+    type MaxInvulnerables = ConstU32<20>;
+    // should be a multiple of session or things will get inconsistent
+    type KickThreshold = Period;
+    type ValidatorId = <Self as frame_system::Config>::AccountId;
+    type ValidatorIdOf = pallet_collator_selection::IdentityCollator;
+    type ValidatorRegistration = Session;
+    type WeightInfo = (); // Configure based on benchmarking results.
+}

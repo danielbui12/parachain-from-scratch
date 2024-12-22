@@ -57,7 +57,7 @@ use frame_support::weights::{
     WeightToFeePolynomial,
 };
 pub use sp_consensus_aura::sr25519::AuthorityId as AuraId;
-pub use sp_runtime::{traits::NumberFor, MultiAddress, Perbill, Permill};
+pub use sp_runtime::{MultiAddress, Perbill, Permill};
 
 #[cfg(any(feature = "std", test))]
 pub use sp_runtime::BuildStorage;
@@ -109,7 +109,7 @@ pub type SignedExtra = (
     frame_system::CheckNonce<Runtime>,
     frame_system::CheckWeight<Runtime>,
     pallet_transaction_payment::ChargeTransactionPayment<Runtime>,
-    // cumulus_primitives_storage_weight_reclaim::StorageWeightReclaim<Runtime>,
+    cumulus_primitives_storage_weight_reclaim::StorageWeightReclaim<Runtime>,
     frame_metadata_hash_extension::CheckMetadataHash<Runtime>,
 );
 
@@ -118,7 +118,7 @@ pub type UncheckedExtrinsic =
     generic::UncheckedExtrinsic<Address, RuntimeCall, Signature, SignedExtra>;
 
 /// Migrations to apply on runtime upgrade.
-// pub type Migrations = pallet_xcm::migration::MigrateToLatestXcmVersion<Runtime>;
+pub type Migrations = pallet_xcm::migration::MigrateToLatestXcmVersion<Runtime>;
 
 /// Executive: handles dispatch to the various modules.
 pub type Executive = frame_executive::Executive<
@@ -127,7 +127,7 @@ pub type Executive = frame_executive::Executive<
     frame_system::ChainContext<Runtime>,
     Runtime,
     AllPalletsWithSystem,
-    // Migrations,
+    Migrations,
 >;
 
 /// Handles converting a weight scalar to a fee value, based on the scale and granularity of the
@@ -216,7 +216,6 @@ pub const DAYS: BlockNumber = HOURS * 24;
 
 // Unit = the base number of indivisible units for balances
 pub const UNIT: Balance = 1_000_000_000_000;
-pub const CENTIUNIT: Balance = 10_000_000_000;
 pub const MILLIUNIT: Balance = 1_000_000_000;
 pub const MICROUNIT: Balance = 1_000_000;
 
@@ -282,22 +281,22 @@ mod runtime {
 
     // System support stuff.
     #[runtime::pallet_index(0)]
-    pub type System = frame_system::Pallet<Runtime>;
+    pub type System = frame_system;
 
-    // #[runtime::pallet_index(1)]
-	// pub type ParachainSystem = cumulus_pallet_parachain_system;
+    #[runtime::pallet_index(1)]
+	pub type ParachainSystem = cumulus_pallet_parachain_system;
 
     #[runtime::pallet_index(2)]
-    pub type Timestamp = pallet_timestamp::Pallet<Runtime>;
+    pub type Timestamp = pallet_timestamp;
 
-    // #[runtime::pallet_index(3)]
-	// pub type ParachainInfo = parachain_info;
+    #[runtime::pallet_index(3)]
+	pub type ParachainInfo = parachain_info;
 
     // Monetary stuff.
     #[runtime::pallet_index(10)]
-    pub type Balances = pallet_balances::Pallet<Runtime>;
+    pub type Balances = pallet_balances;
     #[runtime::pallet_index(11)]
-    pub type TransactionPayment = pallet_transaction_payment::Pallet<Runtime>;
+    pub type TransactionPayment = pallet_transaction_payment;
 
     // Governance
     #[runtime::pallet_index(15)]
@@ -305,38 +304,35 @@ mod runtime {
 
     // Collator support. The order of these 4 are important and shall not change.
     #[runtime::pallet_index(20)]
-    pub type Authorship = pallet_authorship::Pallet<Runtime>;
+    pub type Authorship = pallet_authorship;
 
-    // #[runtime::pallet_index(21)]
-	// pub type CollatorSelection = pallet_collator_selection;
+    #[runtime::pallet_index(21)]
+	pub type CollatorSelection = pallet_collator_selection;
 
     #[runtime::pallet_index(22)]
-    pub type Session = pallet_session::Pallet<Runtime>;
+    pub type Session = pallet_session;
     #[runtime::pallet_index(23)]
-    pub type Aura = pallet_aura::Pallet<Runtime>;
+    pub type Aura = pallet_aura;
 
-    // #[runtime::pallet_index(24)]
-	// pub type AuraExt = cumulus_pallet_aura_ext;
-
-    #[runtime::pallet_index(25)]
-    pub type Grandpa = pallet_grandpa::Pallet<Runtime>;
+    #[runtime::pallet_index(24)]
+	pub type AuraExt = cumulus_pallet_aura_ext;
 
     // XCM helpers.
 
-    // #[runtime::pallet_index(30)]
-	// pub type XcmpQueue = cumulus_pallet_xcmp_queue;
+    #[runtime::pallet_index(30)]
+	pub type XcmpQueue = cumulus_pallet_xcmp_queue;
 
-    // #[runtime::pallet_index(31)]
-	// pub type PolkadotXcm = pallet_xcm;
+    #[runtime::pallet_index(31)]
+	pub type PolkadotXcm = pallet_xcm;
 
-    // #[runtime::pallet_index(32)]
-	// pub type CumulusXcm = cumulus_pallet_xcm;
+    #[runtime::pallet_index(32)]
+	pub type CumulusXcm = cumulus_pallet_xcm;
 
-    // #[runtime::pallet_index(33)]
-	// pub type MessageQueue = pallet_message_queue;
+    #[runtime::pallet_index(33)]
+	pub type MessageQueue = pallet_message_queue;
 }
 
-// cumulus_pallet_parachain_system::register_validate_block! {
-// 	Runtime = Runtime,
-// 	BlockExecutor = cumulus_pallet_aura_ext::BlockExecutor::<Runtime, Executive>,
-// }
+cumulus_pallet_parachain_system::register_validate_block! {
+	Runtime = Runtime,
+	BlockExecutor = cumulus_pallet_aura_ext::BlockExecutor::<Runtime, Executive>,
+}

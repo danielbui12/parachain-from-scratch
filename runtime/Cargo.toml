@@ -55,10 +55,6 @@ sp-std.workspace = true
 sp-transaction-pool.workspace = true
 sp-version.workspace = true
 
-# TODO: solochain dependencies
-pallet-grandpa = { version = "36.0.0", default-features = false }
-sp-consensus-grandpa = { version = "20.0.0", default-features = false }
-
 # Polkadot
 pallet-xcm.workspace = true
 polkadot-parachain-primitives.workspace = true
@@ -131,10 +127,6 @@ std = [
     "sp-std/std",
     "sp-transaction-pool/std",
     "sp-version/std",
-    # TODO: Remove this feature when migrating the node
-    "sp-consensus-grandpa/std",
-    # TODO: Remove this feature when migrating the node
-    "pallet-grandpa/std",
     "xcm-builder/std",
     "xcm-executor/std",
     "xcm/std",

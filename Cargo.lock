@@ -5667,30 +5667,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "pallet-grandpa"
-version = "36.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8244b686d5cae6a8af1557ed0f49db08f812f0e7942a8d2da554b4da8a69daf0"
-dependencies = [
- "frame-benchmarking",
- "frame-support",
- "frame-system",
- "log",
- "pallet-authorship",
- "pallet-session",
- "parity-scale-codec",
- "scale-info",
- "sp-application-crypto",
- "sp-consensus-grandpa",
- "sp-core",
- "sp-io",
- "sp-runtime",
- "sp-session",
- "sp-staking",
- "sp-std",
-]
-
-[[package]]
 name = "pallet-identity"
 version = "36.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6002,7 +5978,6 @@ dependencies = [
  "pallet-authorship",
  "pallet-balances",
  "pallet-collator-selection",
- "pallet-grandpa",
  "pallet-message-queue",
  "pallet-session",
  "pallet-sudo",
@@ -6019,7 +5994,6 @@ dependencies = [
  "sp-api",
  "sp-block-builder",
  "sp-consensus-aura",
- "sp-consensus-grandpa",
  "sp-core",
  "sp-genesis-builder",
  "sp-inherents",

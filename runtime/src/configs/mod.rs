@@ -27,20 +27,19 @@
 // mod xcm_config;
 
 // Substrate and Polkadot dependencies
-// TODO: Import crates
-// use cumulus_pallet_parachain_system::RelayNumberMonotonicallyIncreases;
-// use cumulus_primitives_core::{AggregateMessageOrigin, ParaId};
+use cumulus_pallet_parachain_system::RelayNumberMonotonicallyIncreases;
+use cumulus_primitives_core::{AggregateMessageOrigin, ParaId};
 use frame_support::{
     derive_impl,
-    // dispatch::DispatchClass,
+    dispatch::DispatchClass,
     parameter_types,
     traits::{
         ConstBool,
         ConstU32,
         ConstU64,
         ConstU8,
-        // EitherOfDiverse,
-        // TransformOrigin,
+        EitherOfDiverse,
+        TransformOrigin,
         VariantCountOf,
     },
     weights::{ConstantMultiplier, Weight},
@@ -48,31 +47,27 @@ use frame_support::{
 };
 use frame_system::{
     limits::{BlockLength, BlockWeights},
-    // EnsureRoot,
+    EnsureRoot,
 };
-// TODO: Import crates
-// use pallet_xcm::{EnsureXcm, IsVoiceOfBody};
-// use parachains_common::message_queue::{NarrowOriginToSibling, ParaIdToSibling};
-// use polkadot_runtime_common::{
-//     xcm_sender::NoPriceForMessageDelivery, BlockHashCount, SlowAdjustingFeeUpdate,
-// };
+use pallet_xcm::{EnsureXcm, IsVoiceOfBody};
+use parachains_common::message_queue::{NarrowOriginToSibling, ParaIdToSibling};
+use polkadot_runtime_common::{
+    xcm_sender::NoPriceForMessageDelivery, BlockHashCount, SlowAdjustingFeeUpdate,
+};
 use pallet_transaction_payment::{
     ConstFeeMultiplier,
-    //  FungibleAdapter,
+    FungibleAdapter,
     Multiplier,
 };
 use sp_consensus_aura::sr25519::AuthorityId as AuraId;
 use sp_runtime::{traits::One, Perbill};
 use sp_version::RuntimeVersion;
-// TODO: Import crates
-// use xcm::latest::prelude::BodyId;
-
-// TODO: Import crates
+use xcm::latest::prelude::BodyId;
 // Local module imports
 use super::{
     weights::{
         BlockExecutionWeight,
-        // ExtrinsicBaseWeight,
+        ExtrinsicBaseWeight,
         RocksDbWeight,
     },
     AccountId,
@@ -100,10 +95,10 @@ use super::{
     System,
     WeightToFee,
     // XcmpQueue,
-    // AVERAGE_ON_INITIALIZE_RATIO,
+    AVERAGE_ON_INITIALIZE_RATIO,
     EXISTENTIAL_DEPOSIT,
     HOURS,
-    // MAXIMUM_BLOCK_WEIGHT,
+    MAXIMUM_BLOCK_WEIGHT,
     MICROUNIT,
     NORMAL_DISPATCH_RATIO,
     SLOT_DURATION,
@@ -123,21 +118,21 @@ parameter_types! {
         BlockLength::max_with_normal_ratio(5 * 1024 * 1024, NORMAL_DISPATCH_RATIO);
     pub RuntimeBlockWeights: BlockWeights = BlockWeights::builder()
         .base_block(BlockExecutionWeight::get())
-        // .for_class(DispatchClass::all(), |weights| {
-        //     weights.base_extrinsic = ExtrinsicBaseWeight::get();
-        // })
-        // .for_class(DispatchClass::Normal, |weights| {
-        //     weights.max_total = Some(NORMAL_DISPATCH_RATIO * MAXIMUM_BLOCK_WEIGHT);
-        // })
-        // .for_class(DispatchClass::Operational, |weights| {
-        //     weights.max_total = Some(MAXIMUM_BLOCK_WEIGHT);
-        //     // Operational transactions have some extra reserved space, so that they
-        //     // are included even if block reached `MAXIMUM_BLOCK_WEIGHT`.
-        //     weights.reserved = Some(
-        //         MAXIMUM_BLOCK_WEIGHT - NORMAL_DISPATCH_RATIO * MAXIMUM_BLOCK_WEIGHT
-        //     );
-        // })
-        // .avg_block_initialization(AVERAGE_ON_INITIALIZE_RATIO)
+        .for_class(DispatchClass::all(), |weights| {
+            weights.base_extrinsic = ExtrinsicBaseWeight::get();
+        })
+        .for_class(DispatchClass::Normal, |weights| {
+            weights.max_total = Some(NORMAL_DISPATCH_RATIO * MAXIMUM_BLOCK_WEIGHT);
+        })
+        .for_class(DispatchClass::Operational, |weights| {
+            weights.max_total = Some(MAXIMUM_BLOCK_WEIGHT);
+            // Operational transactions have some extra reserved space, so that they
+            // are included even if block reached `MAXIMUM_BLOCK_WEIGHT`.
+            weights.reserved = Some(
+                MAXIMUM_BLOCK_WEIGHT - NORMAL_DISPATCH_RATIO * MAXIMUM_BLOCK_WEIGHT
+            );
+        })
+        .avg_block_initialization(AVERAGE_ON_INITIALIZE_RATIO)
         .build_or_panic();
     pub const SS58Prefix: u16 = 42;
 }
@@ -146,57 +141,32 @@ parameter_types! {
 /// The default types are being injected by [`derive_impl`](`frame_support::derive_impl`) from
 /// [`ParaChainDefaultConfig`](`struct@frame_system::config_preludes::ParaChainDefaultConfig`),
 /// but overridden as needed.
-#[derive_impl(frame_system::config_preludes::SolochainDefaultConfig)]
+#[derive_impl(frame_system::config_preludes::ParaChainDefaultConfig)]
 impl frame_system::Config for Runtime {
-    // TODO: configure pallet
-    // /// The identifier used to distinguish between accounts.
-    // type AccountId = AccountId;
-    // /// The index type for storing how many extrinsics an account has signed.
-    // type Nonce = Nonce;
-    // /// The type for hashing blocks and tries.
-    // type Hash = Hash;
-    // /// The block type.
-    // type Block = Block;
-    // /// Maximum number of block number to block hash mappings to keep (oldest pruned first).
-    // type BlockHashCount = BlockHashCount;
-    // /// Runtime version.
-    // type Version = Version;
-    // /// The data to be stored in an account.
-    // type AccountData = pallet_balances::AccountData<Balance>;
-    // /// The weight of database operations that the runtime can invoke.
-    // type DbWeight = RocksDbWeight;
-    // /// Block & extrinsics weights: base values and limits.
-    // type BlockWeights = RuntimeBlockWeights;
-    // /// The maximum length of a block (in bytes).
-    // type BlockLength = RuntimeBlockLength;
-    // /// This is used as an identifier of the chain. 42 is the generic substrate prefix.
-    // type SS58Prefix = SS58Prefix;
-    // /// The action to take on a Runtime Upgrade
-    // type OnSetCode = cumulus_pallet_parachain_system::ParachainSetCode<Self>;
-    // type MaxConsumers = frame_support::traits::ConstU32<16>;
-
-    /// The block type for the runtime.
+    /// The identifier used to distinguish between accounts.
+    type AccountId = AccountId;
+    /// The index type for storing how many extrinsics an account has signed.
+    type Nonce = Nonce;
+    /// The type for hashing blocks and tries.
+    type Hash = Hash;
+    /// The block type.
     type Block = Block;
+    /// Maximum number of block number to block hash mappings to keep (oldest pruned first).
+    type BlockHashCount = BlockHashCount;
+    /// Runtime version.
+    type Version = Version;
+    /// The data to be stored in an account.
+    type AccountData = pallet_balances::AccountData<Balance>;
+    /// The weight of database operations that the runtime can invoke.
+    type DbWeight = RocksDbWeight;
     /// Block & extrinsics weights: base values and limits.
     type BlockWeights = RuntimeBlockWeights;
     /// The maximum length of a block (in bytes).
     type BlockLength = RuntimeBlockLength;
-    /// The identifier used to distinguish between accounts.
-    type AccountId = AccountId;
-    /// The type for storing how many extrinsics an account has signed.
-    type Nonce = Nonce;
-    /// The type for hashing blocks and tries.
-    type Hash = Hash;
-    /// Maximum number of block number to block hash mappings to keep (oldest pruned first).
-    type BlockHashCount = ConstU32<250>;
-    /// The weight of database operations that the runtime can invoke.
-    type DbWeight = RocksDbWeight;
-    /// Version of the runtime.
-    type Version = Version;
-    /// The data to be stored in an account.
-    type AccountData = pallet_balances::AccountData<Balance>;
     /// This is used as an identifier of the chain. 42 is the generic substrate prefix.
     type SS58Prefix = SS58Prefix;
+    /// The action to take on a Runtime Upgrade
+	// type OnSetCode = cumulus_pallet_parachain_system::ParachainSetCode<Self>;
     type MaxConsumers = frame_support::traits::ConstU32<16>;
 }
 
@@ -241,19 +211,12 @@ parameter_types! {
     pub const TransactionByteFee: Balance = 10 * MICROUNIT;
 }
 
-// TODO: Update config
-parameter_types! {
-    pub FeeMultiplier: Multiplier = Multiplier::one();
-}
-
-// TODO: Update config
 impl pallet_transaction_payment::Config for Runtime {
     type RuntimeEvent = RuntimeEvent;
     type OnChargeTransaction = pallet_transaction_payment::FungibleAdapter<Balances, ()>;
     type WeightToFee = WeightToFee;
     type LengthToFee = ConstantMultiplier<Balance, TransactionByteFee>;
-    // type FeeMultiplierUpdate = SlowAdjustingFeeUpdate<Self>;
-    type FeeMultiplierUpdate = ConstFeeMultiplier<FeeMultiplier>;
+    type FeeMultiplierUpdate = SlowAdjustingFeeUpdate<Self>;
     type OperationalFeeMultiplier = ConstU8<5>;
 }
 
@@ -276,12 +239,11 @@ impl pallet_grandpa::Config for Runtime {
     type EquivocationReportSystem = ();
 }
 
-// TODO: Configure variables
-// parameter_types! {
-//     pub const ReservedXcmpWeight: Weight = MAXIMUM_BLOCK_WEIGHT.saturating_div(4);
-//     pub const ReservedDmpWeight: Weight = MAXIMUM_BLOCK_WEIGHT.saturating_div(4);
-//     pub const RelayOrigin: AggregateMessageOrigin = AggregateMessageOrigin::Parent;
-// }
+parameter_types! {
+    pub const ReservedXcmpWeight: Weight = MAXIMUM_BLOCK_WEIGHT.saturating_div(4);
+    pub const ReservedDmpWeight: Weight = MAXIMUM_BLOCK_WEIGHT.saturating_div(4);
+    pub const RelayOrigin: AggregateMessageOrigin = AggregateMessageOrigin::Parent;
+}
 
 // TODO: Configure pallet
 // impl cumulus_pallet_parachain_system::Config for Runtime {
